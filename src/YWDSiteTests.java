@@ -4,6 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.*;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
 /*
@@ -17,7 +19,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 
 public class YWDSiteTests {
 
-	// static WebDriver driver = new HtmlUnitDriver();
+	static WebDriver driver = new HtmlUnitDriver();
 	static WebDriver foxDriver = new FirefoxDriver();
 
 	/*
@@ -44,7 +46,7 @@ public class YWDSiteTests {
 	// Then the jump to top icon should become visible
 	// and clicking it should bring me back to the top where it is no longer visible
 	@Test
-	public void testJumpIconDisplayed() throws InterruptedException {
+	public void testJumpIconWorks() throws InterruptedException {
 		foxDriver.get("http://www.rdadesigns.net/yw-d/");
 		JavascriptExecutor jse = (JavascriptExecutor) foxDriver;
 		jse.executeScript("window.scrollBy(0,250)", ""); // scroll down 250 pixels
@@ -52,7 +54,6 @@ public class YWDSiteTests {
 		assertTrue(jumpIcon.isDisplayed());
 		jumpIcon.click();
 		Thread.sleep(1000); // the JavaScript code animates the scroll and fades the button out
-							// before it gets to display: none;
 							// so I have to wait for the animation to finish before checking
 
 		// check the jump icon no longer shows
@@ -61,6 +62,47 @@ public class YWDSiteTests {
 		// check the vertical scroll position is 0, at the top of the page
 		long scrollY = (long) jse.executeScript("return window.scrollY;");
 		assertEquals(scrollY, 0);
+	}
+
+	/*
+	 * As a staff member
+	 * I want users to be aware of and able to get to the donation page
+	 * So that they can donate
+	 * 
+	 * @author Ross Acheson
+	 */
+
+	// [No given needed]
+	// When I navigate to any page on the site
+	// Then I see "Online Donation" button is present
+	@Test
+	public void testDonationButtonPresent() {
+		// test a variety of pages
+		driver.get("http://www.rdadesigns.net/yw-d/"); // home page
+		assertTrue(driver.findElement(By.linkText("Online Donation")).isDisplayed());
+		driver.get("http://www.rdadesigns.net/yw-d/programs/praise/"); // a program page
+		assertTrue(driver.findElement(By.linkText("Online Donation")).isDisplayed());
+		driver.get("http://www.rdadesigns.net/yw-d/about/detroit/"); // an about page
+		assertTrue(driver.findElement(By.linkText("Online Donation")).isDisplayed());
+		driver.get("http://www.rdadesigns.net/yw-d/get-involved/mission-partner/"); // partner
+		assertTrue(driver.findElement(By.linkText("Online Donation")).isDisplayed());
+		driver.get("http://www.rdadesigns.net/yw-d/contact/"); // contact page
+		assertTrue(driver.findElement(By.linkText("Online Donation")).isDisplayed());
+	}
+
+	// Given that the Donation button is present
+	// When I click on it
+	// Then I am navigated to the secure PayPal donation page
+	@Test
+	public void testDonationDestination() {
+		foxDriver.get("http://www.rdadesigns.net/yw-d/");
+		foxDriver.findElement(By.linkText("Online Donation")).click();
+
+		String title = foxDriver.getTitle();
+		assertTrue(title.contains("PayPal"));
+
+		String url = foxDriver.getCurrentUrl();
+		assertTrue(url.contains("https://www.paypal.com")); // correct site, secure protocol
 	}
 
 }
