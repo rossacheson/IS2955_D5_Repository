@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.*;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -104,5 +105,67 @@ public class YWDSiteTests {
 		String url = foxDriver.getCurrentUrl();
 		assertTrue(url.contains("https://www.paypal.com")); // correct site, secure protocol
 	}
+
+	/*
+	 * As a staff member
+	 * I want users to be able to find us on our social media sites
+	 * So that we can increase our social network reach
+	 * and more effectively share who we are
+	 * 
+	 * @author Ross Acheson
+	 */
+
+	// [No given needed]
+	// When I click the social icons
+	// Then I should be directed to our social media pages
+	@Test
+	public void testSocialIconsTarget() {
+		foxDriver.get("http://www.rdadesigns.net/yw-d/");
+		String url;
+		// facebook
+		WebElement fbLinkContainer = foxDriver.findElement(By.className("facebook"));
+		WebElement fbLink = fbLinkContainer.findElement(By.tagName("a"));
+		fbLink.click();
+		url = foxDriver.getCurrentUrl();
+		assertTrue(url.contains("https://www.facebook.com/youthworksdetroit"));
+		foxDriver.navigate().back();
+		// tumblr
+		WebElement tumblrLinkContainer = foxDriver.findElement(By.className("dribbble"));
+		WebElement tumblrLink = tumblrLinkContainer.findElement(By.tagName("a"));
+		tumblrLink.click();
+		url = foxDriver.getCurrentUrl();
+		assertTrue(url.contains("http://youthworksdetroit.tumblr.com/"));
+		foxDriver.navigate().back();
+		// youtube
+		WebElement ytLinkContainer = foxDriver.findElement(By.className("youtube"));
+		WebElement ytLink = ytLinkContainer.findElement(By.tagName("a"));
+		ytLink.click();
+		url = foxDriver.getCurrentUrl();
+		assertTrue(url.contains("https://www.youtube.com/user/youthworksdetroit"));
+		foxDriver.navigate().back();
+
+	}
+
+	// [No given needed]
+	// When I hover over the social icons
+	// Then there should be a tooltip with the name of the social site 
+	@Test
+	public void testSocialIconHover() {
+		//test hover over social icon results in showing tooltip
+		foxDriver.get("http://www.rdadesigns.net/yw-d/");
+		WebElement fbLinkContainer = foxDriver.findElement(By.className("facebook"));
+		new Actions(foxDriver).moveToElement(fbLinkContainer).perform(); //hover
+		String tooltip = foxDriver.findElement(By.className("tooltip-inner")).getText();
+		assertTrue(tooltip.equals("Facebook"));
+	}
+	
+	
+
+	// ..........
+	// @Test
+	// public void testAccordion() {
+	// foxDriver.get("http://www.rdadesigns.net/yw-d/get-involved/internships/");
+	//
+	// }
 
 }
