@@ -1,6 +1,5 @@
 import static org.junit.Assert.*;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.*;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
@@ -162,32 +161,32 @@ public class YWDSiteTests {
 		assertTrue(tooltip.equals("Facebook"));
 	}
 
-/*	
- * This test removed. I think it worked previously, but more that 100 manual checks
- * could have been performed in the time it has taken me to fail at debugging this test.
- * Various complicated attempted workarounds have been removed so that the logic shows more simply.
- * 
- *  // Given I am on the Media page, and not signed in to facebook in my browser
- *	// When I click the 'Like Page' button
- *	// Then I should be directed to a facebook sign-in
- *	@Test
- *	public void testFacebookWidget() throws InterruptedException {
- *		foxDriver.get("http://www.rdadesigns.net/yw-d/about/media");
- *		// facebook widget loads slower than the page, so use explicit wait
- *		WebElement likePageButton = (new WebDriverWait(foxDriver, 10)).until(ExpectedConditions
- *				.presenceOfElementLocated(By.className("pluginConnectButtonDisconnected")));
- *		likePageButton.click();
- *		String url = foxDriver.getCurrentUrl();
- *		assertTrue(url.contains("https://www.facebook.com/youthworksdetroit"));
- *	}*/
-
-
-	// ***************** Malini's Tests ***********
+	/*
+	 * This test removed. I think it worked previously, but more that 100 manual checks
+	 * could have been performed in the time it has taken me to fail at debugging this test.
+	 * Various complicated attempted workarounds have been removed so that the logic shows more
+	 * simply.
+	 * 
+	 * // Given I am on the Media page, and not signed in to facebook in my browser
+	 * // When I click the 'Like Page' button
+	 * // Then I should be directed to a facebook sign-in
+	 * 
+	 * @Test
+	 * public void testFacebookWidget() throws InterruptedException {
+	 * foxDriver.get("http://www.rdadesigns.net/yw-d/about/media");
+	 * // facebook widget loads slower than the page, so use explicit wait
+	 * WebElement likePageButton = (new WebDriverWait(foxDriver, 10)).until(ExpectedConditions
+	 * .presenceOfElementLocated(By.className("pluginConnectButtonDisconnected")));
+	 * likePageButton.click();
+	 * String url = foxDriver.getCurrentUrl();
+	 * assertTrue(url.contains("https://www.facebook.com/youthworksdetroit"));
+	 * }
+	 */
 
 	/*
 	 * As a user
-	 * I want users to be able to to open(expand) and close(contract) the accordions
-	 * So that I can get the information but not be overwhelmed by it all at once
+	 * I want to be able to to open(expand) and close(contract) the accordions
+	 * So that I can get the information, but not be overwhelmed by it all at once
 	 * 
 	 * @author Malini Santra
 	 */
@@ -207,21 +206,6 @@ public class YWDSiteTests {
 				.contains("Young people between the ages of 18 and 25 who have a desire to grow "
 						+ "in their relationship with the Lord and to learn what it means to give "
 						+ "all that they have for Jesus."));
-	}
-
-	// Given that I am on the "Internships" page
-	// When I click twice on the first accordion which has the question
-	// Then it expands and contracts, leaving the answer hidden
-	@Test
-	public void testAccordionContractedText() {
-		foxDriver.get("http://www.rdadesigns.net/yw-d/get-involved/internships/");
-		// Click on first accordion to expand
-		foxDriver.findElement(By.cssSelector("div.su-spoiler-title")).click();
-		// Click on first accordion again to contract
-		foxDriver.findElement(By.cssSelector("div.su-spoiler-title")).click();
-		// Assertion
-		String observed = foxDriver.findElement(By.cssSelector("span.su-spoiler-icon")).getText();
-		assertTrue(observed.contains(""));
 	}
 
 	// Given that I am on the "Internships" page
@@ -336,11 +320,12 @@ public class YWDSiteTests {
 		foxDriver.get("http://www.rdadesigns.net/yw-d/wp-login.php?action=logout");
 		foxDriver.findElement(By.linkText("log out")).click();
 	}
-		// Two in one
+
+	// Two in one
 	// Given that I am on the sign-in page
 	// When I enter the incorrect username and incorrect password
 	// Then I am prevented from signing into my account and get an error message
-		// also covers
+	// also covers
 	// Given that I am on the sign-in page
 	// When I enter a default/easily guessable username and password
 	// Then I am prevented from signing into my account and get an error message
@@ -348,7 +333,7 @@ public class YWDSiteTests {
 	public void testIncorrectUsernameAndPassword() {
 		foxDriver.get("http://www.rdadesigns.net/yw-d/admin");
 		// Click on textbox for username and type the username
-		foxDriver.findElement(By.id("user_login")).sendKeys("admin"); 
+		foxDriver.findElement(By.id("user_login")).sendKeys("admin");
 		// Click on textbox for password and type password
 		foxDriver.findElement(By.id("user_pass")).sendKeys("admin");
 		// Click on "Log In"
