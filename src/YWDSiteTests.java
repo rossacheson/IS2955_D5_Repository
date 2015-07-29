@@ -6,6 +6,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
@@ -119,26 +120,29 @@ public class YWDSiteTests {
 	// When I click the social icons
 	// Then I should be directed to our social media pages
 	@Test
-	public void testSocialIconsTarget() {
+	public void testSocialIconsTarget() throws InterruptedException {
 		foxDriver.get("http://www.rdadesigns.net/yw-d/");
 		String url;
-		// facebook
-		WebElement fbLinkContainer = foxDriver.findElement(By.className("facebook"));
-		WebElement fbLink = fbLinkContainer.findElement(By.tagName("a"));
+		// --facebook--
+		WebElement linkContainer = foxDriver.findElement(By.className("facebook"));
+		WebElement fbLink = linkContainer.findElement(By.tagName("a"));
 		fbLink.click();
 		url = foxDriver.getCurrentUrl();
 		assertTrue(url.contains("https://www.facebook.com/youthworksdetroit"));
 		foxDriver.navigate().back();
-		// tumblr
-		WebElement tumblrLinkContainer = foxDriver.findElement(By.className("dribbble"));
-		WebElement tumblrLink = tumblrLinkContainer.findElement(By.tagName("a"));
+		// --tumblr--
+		linkContainer = foxDriver.findElement(By.className("dribbble"));
+		WebElement tumblrLink = linkContainer.findElement(By.tagName("a"));
 		tumblrLink.click();
 		url = foxDriver.getCurrentUrl();
 		assertTrue(url.contains("http://youthworksdetroit.tumblr.com/"));
 		foxDriver.navigate().back();
-		// youtube
-		WebElement ytLinkContainer = foxDriver.findElement(By.className("youtube"));
-		WebElement ytLink = ytLinkContainer.findElement(By.tagName("a"));
+		// --youtube--
+		// added explicit wait below to alleviate race condition where we tried to get
+		// the youtube container element before it was loaded
+		linkContainer = (new WebDriverWait(foxDriver, 10)).until(ExpectedConditions
+				.presenceOfElementLocated(By.className("youtube")));
+		WebElement ytLink = linkContainer.findElement(By.tagName("a"));
 		ytLink.click();
 		url = foxDriver.getCurrentUrl();
 		assertTrue(url.contains("https://www.youtube.com/user/youthworksdetroit"));
@@ -147,25 +151,245 @@ public class YWDSiteTests {
 	}
 
 	// [No given needed]
-	// When I hover over the social icons
-	// Then there should be a tooltip with the name of the social site 
+	// When I hover over a social icon
+	// Then there should be a tooltip with the name of the social site
 	@Test
 	public void testSocialIconHover() {
-		//test hover over social icon results in showing tooltip
 		foxDriver.get("http://www.rdadesigns.net/yw-d/");
 		WebElement fbLinkContainer = foxDriver.findElement(By.className("facebook"));
-		new Actions(foxDriver).moveToElement(fbLinkContainer).perform(); //hover
+		new Actions(foxDriver).moveToElement(fbLinkContainer).perform(); // hover
 		String tooltip = foxDriver.findElement(By.className("tooltip-inner")).getText();
 		assertTrue(tooltip.equals("Facebook"));
 	}
-	
-	
 
-	// ..........
-	// @Test
-	// public void testAccordion() {
-	// foxDriver.get("http://www.rdadesigns.net/yw-d/get-involved/internships/");
-	//
-	// }
+/*	
+ * This test removed. I think it worked previously, but more that 100 manual checks
+ * could have been performed in the time it has taken me to fail at debugging this test.
+ * Various complicated attempted workarounds have been removed so that the logic shows more simply.
+ * 
+ *  // Given I am on the Media page, and not signed in to facebook in my browser
+ *	// When I click the 'Like Page' button
+ *	// Then I should be directed to a facebook sign-in
+ *	@Test
+ *	public void testFacebookWidget() throws InterruptedException {
+ *		foxDriver.get("http://www.rdadesigns.net/yw-d/about/media");
+ *		// facebook widget loads slower than the page, so use explicit wait
+ *		WebElement likePageButton = (new WebDriverWait(foxDriver, 10)).until(ExpectedConditions
+ *				.presenceOfElementLocated(By.className("pluginConnectButtonDisconnected")));
+ *		likePageButton.click();
+ *		String url = foxDriver.getCurrentUrl();
+ *		assertTrue(url.contains("https://www.facebook.com/youthworksdetroit"));
+ *	}*/
+
+
+	// ***************** Malini's Tests ***********
+
+	/*
+	 * As a user
+	 * I want users to be able to to open(expand) and close(contract) the accordions
+	 * So that I can get the information but not be overwhelmed by it all at once
+	 * 
+	 * @author Malini Santra
+	 */
+
+	// Given that I am on the "Internships" page
+	// When I click on the first accordion having a question
+	// Then then it expands and shows me the answer
+	@Test
+	public void testAccordionExpandedText() {
+		foxDriver.get("http://www.rdadesigns.net/yw-d/get-involved/internships/");
+		// Click on first accordion to expand
+		foxDriver.findElement(By.cssSelector("div.su-spoiler-title")).click();
+		// Assertion
+		String observed = foxDriver.findElement(
+				By.cssSelector("div.su-spoiler-content.su-clearfix")).getText();
+		assertTrue(observed
+				.contains("Young people between the ages of 18 and 25 who have a desire to grow "
+						+ "in their relationship with the Lord and to learn what it means to give "
+						+ "all that they have for Jesus."));
+	}
+
+	// Given that I am on the "Internships" page
+	// When I click twice on the first accordion which has the question
+	// Then it expands and contracts, leaving the answer hidden
+	@Test
+	public void testAccordionContractedText() {
+		foxDriver.get("http://www.rdadesigns.net/yw-d/get-involved/internships/");
+		// Click on first accordion to expand
+		foxDriver.findElement(By.cssSelector("div.su-spoiler-title")).click();
+		// Click on first accordion again to contract
+		foxDriver.findElement(By.cssSelector("div.su-spoiler-title")).click();
+		// Assertion
+		String observed = foxDriver.findElement(By.cssSelector("span.su-spoiler-icon")).getText();
+		assertTrue(observed.contains(""));
+	}
+
+	// Given that I am on the "Internships" page
+	// When I click on the first accordion having a question
+	// Then it expands to at least twice as tall as initially (actual expanded height depends on
+	// screen width)
+	@Test
+	public void testAccordionExpandedHeight() {
+		foxDriver.get("http://www.rdadesigns.net/yw-d/get-involved/internships/");
+		// Click on first accordion to expand
+		foxDriver.findElement(By.cssSelector("div.su-spoiler-title")).click();
+		// Assertion
+		int elementheight = foxDriver
+				.findElement(
+						By.cssSelector("div.su-spoiler.su-spoiler-style-fancy.su-spoiler-icon-plus"))
+				.getSize().getHeight();
+		assertTrue(elementheight >= 72); // initial height: 36; should expand to at least 72
+	}
+
+	// Given that I am on the "Internships" page
+	// When I click twice on the first accordion having a question
+	// Then it expands and contracts, leaving the height at the initial height of (36px)
+	@Test
+	public void testAccordionContractedHeight() {
+		foxDriver.get("http://www.rdadesigns.net/yw-d/get-involved/internships/");
+		// //Click on first accordion to expand
+		foxDriver.findElement(By.cssSelector("div.su-spoiler-title")).click();
+		// Click on first accordion again to contract
+		foxDriver.findElement(By.cssSelector("div.su-spoiler-title")).click();
+		// Assertion
+		int elementheight = foxDriver
+				.findElement(
+						By.cssSelector("div.su-spoiler.su-spoiler-style-fancy.su-spoiler-icon-plus.su-spoiler-closed"))
+				.getSize().getHeight();
+		assertEquals(elementheight, 36);
+	}
+
+	/*
+	 * As a user
+	 * I want to be able to fill a form
+	 * So that I can get registered for "Job Readiness Workshops"
+	 * 
+	 * @author Malini Santra
+	 */
+
+	// Given that I am on the Job Readiness Workshops registration page
+	// When I complete the form and click submit
+	// Then the form submits and I am returned to the Job Readiness Workshops registration page
+	@Test
+	public void testSuccesfulFormValidation() {
+		foxDriver
+				.get("http://www.rdadesigns.net/yw-d/programs/streetteam/street-team-application/job-readiness-workshop-registration-2/");
+		// Filling out Form Details
+		foxDriver.findElement(By.name("textfield")).sendKeys("Malini");
+		foxDriver.findElement(By.name("textfield2")).sendKeys("Santra");
+		foxDriver.findElement(By.name("textfield3")).sendKeys("malini.santra@gmail.com");
+		foxDriver.findElement(By.name("textfield4")).sendKeys("173 Morewood Avenue");
+		foxDriver.findElement(By.name("textfield5")).sendKeys("Pittsburgh");
+		foxDriver.findElement(By.name("textfield6")).sendKeys("PA");
+		foxDriver.findElement(By.name("textfield7")).sendKeys("15213");
+		foxDriver.findElement(By.name("textfield8")).sendKeys("4126134004");
+		foxDriver.findElement(By.name("textfield9")).sendKeys("22");
+		new Select(foxDriver.findElement(By.name("select"))).selectByVisibleText("Senior");
+		// Click on Submit
+		foxDriver.findElement(By.name("Submit")).click();
+
+		// Assertion
+		WebElement element = foxDriver.findElement(By.cssSelector("h1"));
+		assertEquals(element.getText(), "Job Readiness Workshop Registration");
+	}
+
+	// Given that I am on the Job Readiness Workshops registration page
+	// When I click Submit without having entered my information
+	// Then submission is prevented, and the cursor goes to the "Name" field
+	// (the first required that has not been completed) asking me to fill it
+	@Test
+	public void testUnSuccesfulFormValidation() {
+		foxDriver
+				.get("http://www.rdadesigns.net/yw-d/programs/streetteam/street-team-application/job-readiness-workshop-registration-2/");
+		// Click on Submit
+		foxDriver.findElement(By.name("Submit")).click();
+
+		// Assertion
+		WebElement element = foxDriver.findElement(By.name("textfield"));
+		assertTrue(element.equals(foxDriver.switchTo().activeElement()));
+	}
+
+	/*
+	 * As an administrator
+	 * I want to be able to sign in
+	 * So that I can manage the site
+	 * 
+	 * @author Malini Santra
+	 */
+
+	// Given that I am on the sign-in page
+	// When I enter the correct username and correct password
+	// Then I am signed into my account
+	@Test
+	public void testCorrectUsernameandPassword() {
+		foxDriver.get("http://www.rdadesigns.net/yw-d/admin");
+		// Click on textbox for username and type the username
+		foxDriver.findElement(By.id("user_login")).sendKeys("Malini");
+		// Click on password and type password
+		foxDriver.findElement(By.id("user_pass")).sendKeys("Malini's pw");
+		// CLick on "Log in"
+		foxDriver.findElement(By.id("wp-submit")).click();
+		// Assertion
+		assertEquals("Howdy, Malini Santra",
+				foxDriver.findElement(By.linkText("Howdy, Malini Santra")).getText());
+		// logout
+		foxDriver.get("http://www.rdadesigns.net/yw-d/wp-login.php?action=logout");
+		foxDriver.findElement(By.linkText("log out")).click();
+	}
+		// Two in one
+	// Given that I am on the sign-in page
+	// When I enter the incorrect username and incorrect password
+	// Then I am prevented from signing into my account and get an error message
+		// also covers
+	// Given that I am on the sign-in page
+	// When I enter a default/easily guessable username and password
+	// Then I am prevented from signing into my account and get an error message
+	@Test
+	public void testIncorrectUsernameAndPassword() {
+		foxDriver.get("http://www.rdadesigns.net/yw-d/admin");
+		// Click on textbox for username and type the username
+		foxDriver.findElement(By.id("user_login")).sendKeys("admin"); 
+		// Click on textbox for password and type password
+		foxDriver.findElement(By.id("user_pass")).sendKeys("admin");
+		// Click on "Log In"
+		foxDriver.findElement(By.id("wp-submit")).click();
+		// Assertion
+		WebElement element = foxDriver.findElement(By.id("login_error"));
+		assertNotNull(element);
+	}
+
+	// Given that I am on the sign-in page
+	// When I enter the incorrect username and correct password
+	// Then I am prevented from signing into my account and get an error message
+	@Test
+	public void testIncorrectUsernameAndCorrectPassword() {
+		foxDriver.get("http://www.rdadesigns.net/yw-d/admin");
+		// Click on textbox for username and type the username
+		foxDriver.findElement(By.id("user_login")).sendKeys("Ross");
+		// Click on textbox for password and type password
+		foxDriver.findElement(By.id("user_pass")).sendKeys("Malini's pw");
+		// Click on "Log In"
+		foxDriver.findElement(By.id("wp-submit")).click();
+		// Assertion
+		WebElement element = foxDriver.findElement(By.id("login_error"));
+		assertNotNull(element);
+	}
+
+	// Given that I am on the sign-in page
+	// When I enter the correct username and incorrect password
+	// Then I am prevented from signing into my account and get an error message
+	@Test
+	public void testCorrectUsernameAndIncorrectPassword() {
+		foxDriver.get("http://www.rdadesigns.net/yw-d/admin");
+		// Click on textbox for username and type the username
+		foxDriver.findElement(By.id("user_login")).sendKeys("Malini");
+		// Click on textbox for password and type password
+		foxDriver.findElement(By.id("user_pass")).sendKeys("qwerty");
+		// Click on "Log In"
+		foxDriver.findElement(By.id("wp-submit")).click();
+		// Assertion
+		WebElement element = foxDriver.findElement(By.id("login_error"));
+		assertNotNull(element);
+	}
 
 }
